@@ -1,4 +1,4 @@
-# cloud-button-examples
+# CloudButton Notebook Examples
 Notebook examples for PyWren
 
 ### Pi estimation using Montecarlo method
