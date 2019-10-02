@@ -43,7 +43,8 @@ class AcumPlotCallback:
             self.plotter.plotGraph(self.mat_acum)
             ch.stop_consuming()
 
-def pw_mandelbrot_set(xmin, xmax, ymin, ymax, width, height, concurrency, maxiter, queue_name):
+def pw_mandelbrot_set(xmin, xmax, ymin, ymax, width, height, 
+                      concurrency, maxiter, queue_name):
      
     mat_block_sz = int(sqrt((width * height) / concurrency))    
     blocks_per_column = blocks_per_row = concurrency / sqrt(concurrency)    
@@ -76,37 +77,25 @@ def pw_mandelbrot_set(xmin, xmax, ymin, ymax, width, height, concurrency, maxite
     pw.map(mandelbrot_chunk_fn, range(concurrency))
     
 def mandelbrot_image(xmin, xmax, ymin, ymax, width, height, 
-                         maxiter, concurrency, subplots=None):
+                     maxiter, concurrency, subplots=None):
 
     dpi = 72
-    img_width = width
-    img_height = height
-
     if not subplots:
-        fig, ax = plt.subplots(figsize=(img_width/dpi, img_height/dpi), dpi=dpi)
-        ticks = np.arange(0,img_width,3*dpi)
-        x_ticks = xmin + (xmax-xmin)*ticks/img_width
-        plt.xticks(ticks, x_ticks)
-        y_ticks = ymin + (ymax-ymin)*ticks/img_width
-        plt.yticks(ticks, y_ticks)
-        
-        plt.ion()
-        fig.show()
-        fig.canvas.draw()
+        fig, ax = create_subplots(width, height)
     else:
         fig, ax = subplots
-        ticks = np.arange(0,img_width,3*dpi)
-        x_ticks = xmin + (xmax-xmin)*ticks/img_width
-        plt.xticks(ticks, x_ticks)
-        y_ticks = ymin + (ymax-ymin)*ticks/img_width
-        plt.yticks(ticks, y_ticks)
+    ticks = np.arange(0,width,3*dpi)
+    x_ticks = xmin + (xmax-xmin)*ticks/width
+    plt.xticks(ticks, x_ticks)
+    y_ticks = ymin + (ymax-ymin)*ticks/height
+    plt.yticks(ticks, y_ticks)
 
     with open(os.path.expanduser('~/.pywren_config'), 'r') as f:
         secret = yaml.safe_load(f)
     pika_params = pika.URLParameters(secret['rabbitmq']['amqp_url'])
     connection = pika.BlockingConnection(pika_params)
     channel = connection.channel()
-    queue_name = 'pw-mandelbrot-result-queue'
+    queue_name = 'pw-mandelbrot-result-queuee'
     channel.queue_declare(queue_name)
 
     mat_block_sz = int(sqrt((width * height) / concurrency))    
@@ -117,6 +106,17 @@ def mandelbrot_image(xmin, xmax, ymin, ymax, width, height,
     pw_mandelbrot_set(xmin, xmax, ymin, ymax, width, height, concurrency, maxiter, queue_name)
     channel.basic_consume(consumer_callback=callback, queue=queue_name, no_ack=True)
     channel.start_consuming()
+
+
+def create_subplots(width, height):
+    dpi = 72
+    img_width = width / dpi
+    img_height = height / dpi
+    fig, ax = plt.subplots(figsize=(img_width, img_height), dpi=dpi)
+    
+    plt.ion()
+    fig.show()
+    fig.canvas.draw()
 
     return fig, ax
     
