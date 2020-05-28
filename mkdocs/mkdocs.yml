@@ -1,0 +1,34 @@
+#copyright: Copyright &copy; 2020 Uber Technologies Inc.
+#docs_dir: _build/pydocmd
+#edit_uri: edit/master/mkdocs/
+#extra_javascript:
+#- js/canvas.js
+markdown_extensions:
+- toc:
+    baselevel: 2
+    permalink: true
+- codehilite:
+    guess_lang: false
+
+nav:
+- Home: index.md
+- Getting started: getting-started.md
+- Examples:
+  - Mandelbrot set: examples/mandelbrot_set.md
+  - Pi montecarlo: examples/pi_montecarlo.md
+  - Moments in time: moments-in-time.md
+
+repo_name: cloudbutton/cloudbutton
+repo_url: https://github.com/cloudbutton/cloudbutton
+#site_author: Jiale Zhi
+site_description: "Cloudbutton is a multicloud library for running serverless jobs in Python that implements the multiprocessing interface."
+site_name: Cloudbutton
+theme:
+  name: material
+  custom_dir: landing/
+  # favicon: img/favicon.ico
+  # language: en
+  # logo: img/fiber_logo.png
+  # name: material
+  # palette:
+  #   primary: white
