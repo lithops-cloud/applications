@@ -5,16 +5,12 @@ import subprocess
 import numpy as np
 from PIL import Image
 import cv2
-import io
-from cloudbutton import CloudStorage
-
+import tempfile
 
 def extract_frames(video_file, num_frames=8):
     """Return a list of PIL image frames uniformly sampled from an mp4 video."""
-    try:
-        os.makedirs(os.path.join(os.getcwd(), 'frames'))
-    except OSError:
-        pass
+    folder = next(tempfile._get_candidate_names())
+    os.mkdir(folder)
     output = subprocess.Popen(['ffmpeg', '-i', video_file],
                               stderr=subprocess.PIPE).communicate()
     # Search and parse 'Duration: 00:05:24.13,' from ffmpeg stderr.
@@ -29,11 +25,11 @@ def extract_frames(video_file, num_frames=8):
                                '-vf', 'fps={}'.format(rate),
                                '-vframes', str(num_frames),
                                '-loglevel', 'panic',
-                               'frames/%d.jpg']).communicate()
-    frame_paths = sorted([os.path.join('frames', frame)
-                          for frame in os.listdir('frames')])
+                               folder+'/%d.jpg']).communicate()
+    frame_paths = sorted([os.path.join(folder, frame)
+                          for frame in os.listdir(folder)])
     frames = load_frames(frame_paths, num_frames=num_frames)
-    subprocess.call(['rm', '-rf', 'frames'])
+    subprocess.call(['rm', '-rf', folder])
     return frames
 
 
@@ -60,26 +56,6 @@ def render_frames(frames, prediction):
     return rendered_frames
 
 
-class CloudFileProxy:
-    def __init__(self, cloud_storage=None):
-        self.cs = cloud_storage or CloudStorage()
-
-    def __call__(self, filename, mode='r'):
-        self.key = filename
-        self.mode = mode
-        return self
-
-    def __enter__(self):
-        if 'r' in self.mode:
-            seekable = io.BytesIO(self.cs.get_data(self.key))
-            return seekable
-        return self
-
-    def __exit__(self, *args):
-        self.key = None
-
-    def write(self, data):
-        self.cs.put_data(self.key, data)
 
 
     
