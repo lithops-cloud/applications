@@ -7,6 +7,7 @@ from PIL import Image
 import cv2
 import tempfile
 
+
 def extract_frames(video_file, num_frames=8):
     """Return a list of PIL image frames uniformly sampled from an mp4 video."""
     folder = next(tempfile._get_candidate_names())
@@ -54,8 +55,3 @@ def render_frames(frames, prediction):
                     1, (255, 255, 255), 2)
         rendered_frames.append(img)
     return rendered_frames
-
-
-
-
-    

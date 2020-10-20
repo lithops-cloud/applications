@@ -1,8 +1,18 @@
-# CloudButton Notebook Examples
-Notebook examples for PyWren
+# Lithops end-to-end Applications
 
-## Mandelbrot set computation
-[![Youtube video preview](https://i.ibb.co/XYYrx0w/mandelbrot-yt-preview.png)](https://www.youtube.com/watch?v=XHFJeJwBlmE)
+This repository contains examples of Lithops applications in different ambits.
 
-## Pi estimation using Montecarlo method
-[![Youtube video preview](https://i.ibb.co/y6SBLY2/pi-ytpreview.png)](https://www.youtube.com/watch?v=U3pL965qinM)
+
+1. Serverless benchmarks
+
+2. Moments in time
+
+3. Mandelbrot set computation
+
+4. Pi estimation
+
+5. Stock prediction
+
+6. GROMACS computations
+
+7. Airbnb comments sentiment analysis
