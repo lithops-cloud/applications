@@ -1,11 +1,9 @@
-import os
-from functools import partial
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchvision.models import resnet50
 from torchvision import transforms
+
 
 def modify_resnets(model):
     # Modify attributs
