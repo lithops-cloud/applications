@@ -1,6 +1,6 @@
-## AirBnB sentiment analysis of the comments from multiples cities
+## AirBnB sentiment analysis of the comments from multiple cities
 
-Download the Airbnb dataset and upload it to a COS bucket:
+Login to the [IBM Watson Studio](https://dataplatform.cloud.ibm.com/), Download the Airbnb dataset, and upload it to a COS bucket:
 
 1. [Amsterdam](https://dataplatform.cloud.ibm.com/api/exchange/actions/download-dataset/107ab470f90be9a4815791d8ec829133)
 2. [Antwerp Belgium](https://dataplatform.cloud.ibm.com/api/exchange/actions/download-dataset/9fc8543fabfc26f908cf0c592c89d137)

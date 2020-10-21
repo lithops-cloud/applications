@@ -7,7 +7,7 @@ import lithops
 import matplotlib.pyplot as plt
 
 
-BUCKET = '//airbnb-dataset'
+BUCKET = 'cos://airbnb-dataset'
 
 DATSET_URLS = [BUCKET+'/Amsterdam',
                BUCKET+'/Antwerp Belgium',
@@ -186,7 +186,7 @@ CHUNK_SIZE = 8*1024**2
 
 if __name__ == "__main__":
     t0 = time.time()
-    fexec = lithops.FunctionExecutor(runtime='jsampe/pywren-mpl-nltk-v36:0.9', runtime_memory=1024)
+    fexec = lithops.FunctionExecutor(runtime='jsampe/lithops-mpl-nltk-v36', runtime_memory=1024)
     fexec.map_reduce(analyze_comments, BUCKET, create_map, chunk_size=CHUNK_SIZE, reducer_one_per_object=True)
     results = fexec.get_result()
 
