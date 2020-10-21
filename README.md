@@ -5,14 +5,12 @@ This repository contains examples of Lithops applications in different ambits.
 
 1. [Serverless benchmarks](benchmarks)
 
-2. [Moments in time](momentsintime)
+2. [Monte Carlo applications][montecarlo)
 
-3. [Mandelbrot set computation](mandelbrot)
+3. [Moments in time](momentsintime)
 
-4. [Pi estimation](pi_montecarlo)
+4. [Mandelbrot set computation](mandelbrot)
 
-5. [Stock prediction](stock_prediction)
+5. [GROMACS computations](gromacs)
 
-6. [GROMACS computations](gromacs)
-
-7. [Airbnb comments sentiment analysis](airbnb)
+6. [Airbnb comments sentiment analysis](airbnb)
