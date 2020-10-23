@@ -7,47 +7,47 @@ import lithops
 import matplotlib.pyplot as plt
 
 
-BUCKET = 'cos://airbnb-dataset'
+BUCKET = ['cos://airbnb-dataset/']
 
-DATSET_URLS = [BUCKET+'/Amsterdam',
-               BUCKET+'/Antwerp Belgium',
-               BUCKET+'/Athens Europe',
-               BUCKET+'/Austin',
-               BUCKET+'/Barcelona',
-               BUCKET+'/Berlin',
-               BUCKET+'/Boston',
-               BUCKET+'/Brussels',
-               BUCKET+'/Chicago',
-               BUCKET+'/Dublin',
-               BUCKET+'/London',
-               BUCKET+'/Los Angeles',
-               BUCKET+'/Madrid',
-               BUCKET+'/Palma Mallorca Spain',
-               BUCKET+'/Melbourne',
-               BUCKET+'/Montreal',
-               BUCKET+'/Nashville',
-               BUCKET+'/New Orleans',
-               BUCKET+'/New York City',
-               BUCKET+'/Oakland',
-               BUCKET+'/Paris',
-               BUCKET+'/Portland',
-               BUCKET+'/San Diego',
-               BUCKET+'/City of San Francisco',
-               BUCKET+'/Santa Cruz',
-               BUCKET+'/Seattle',
-               BUCKET+'/Sydney',
-               BUCKET+'/Toronto',
-               BUCKET+'/Trento',
-               BUCKET+'/Vancouver',
-               BUCKET+'/Venice Italy',
-               BUCKET+'/Vienna Austria.',
-               BUCKET+'/Washington D.C.']
+DATASET = {'amsterdam-2016-01-03-reviews.csv': 'Amsterdam',
+           'antwerp-2015-10-03-reviews.csv': 'Antwerp Belgium',
+           'athens-2015-07-17-reviews.csv': 'Athens Europe',
+           'austin-2015-11-07-reviews.csv': 'Austin',
+           'barcelona-2016-01-03-reviews.csv': 'Barcelona',
+           'berlin-2015-10-03-reviews.csv': 'Berlin',
+           'boston-2015-10-03-reviews.csv': 'Boston',
+           'brussels-2015-10-03-reviews.csv': 'Brussels',
+           'chicago-2015-10-03-reviews.csv': 'Chicago',
+           'dublin-2016-01-06-reviews.csv': 'Dublin',
+           'london-2016-02-02-reviews.csv': 'London',
+           'los-angeles-2016-01-02-reviews.csv': 'Los Angeles',
+           'madrid-2015-10-02-reviews.csv': 'Madrid',
+           'mallorca-2016-01-06-reviews.csv': 'Palma Mallorca Spain',
+           'melbourne-2016-01-03-reviews.csv': 'Melbourne',
+           'montreal-2015-10-02-reviews.csv': 'Montreal',
+           'nashville-2015-10-03-reviews.csv': 'Nashville',
+           'new-orleans-2015-09-02-reviews.csv': 'New Orleans',
+           'new-york-city-2016-02-02-reviews.csv': 'New York City',
+           'oakland-2015-06-22-reviews.csv': 'Oakland',
+           'paris-2015-09-02-reviews.csv': 'Paris',
+           'portland-2016-01-01-reviews.csv': 'Portland',
+           'san-diego-2015-06-22-reviews.csv': 'San Diego',
+           'san-francisco-2015-11-01-reviews.csv': 'City of San Francisco',
+           'santa-cruz-county-2015-10-15-reviews.csv': 'Santa Cruz',
+           'seattle-2016-01-04-reviews.csv': 'Seattle',
+           'sydney-2016-01-03-reviews.csv': 'Sydney',
+           'toronto-2015-09-03-reviews.csv': 'Toronto',
+           'trentino-2015-10-12-reviews.csv': 'Trento',
+           'vancouver-2015-12-03-reviews.csv': 'Vancouver',
+           'venice-2015-07-18-reviews.csv': 'Venice Italy',
+           'vienna-2015-07-18-reviews.csv': 'Vienna Austria.',
+           'washington-dc-2015-10-03-reviews.csv': 'Washington D.C.'}
 
 
 def analyze_comments(obj):
     from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
-    city = obj.key
+    city = DATASET[obj.key]
     print('City: {}'.format(city))
 
     print('Copying dataset to local disk')
@@ -181,13 +181,12 @@ def create_map(results):
     return {'city': city, 'comments': comments, 'map': image_string}
 
 
-CHUNK_SIZE = 8*1024**2
-
-
 if __name__ == "__main__":
     t0 = time.time()
-    fexec = lithops.FunctionExecutor(runtime='jsampe/lithops-mpl-nltk-v36', runtime_memory=1024)
-    fexec.map_reduce(analyze_comments, BUCKET, create_map, chunk_size=CHUNK_SIZE, reducer_one_per_object=True)
+
+    fexec = lithops.FunctionExecutor(runtime='jsampe/lithops-mpl-nltk-v36', runtime_memory=2048)
+    fexec.map_reduce(analyze_comments, BUCKET, create_map, reducer_one_per_object=True)
+    # fexec.map(analyze_comments, BUCKET)
     results = fexec.get_result()
 
     for res in results:
@@ -195,5 +194,5 @@ if __name__ == "__main__":
             i.write(base64.b64decode(res['map']))
         print('{}: {}'.format(res['city'], res['comments']))
 
-    print(time.time()-t0)
+    print('Total time: {} seconds'.format(round(time.time()-t0, 2)))
     fexec.plot(dst='plots/test')
