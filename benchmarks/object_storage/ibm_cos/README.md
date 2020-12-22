@@ -1,6 +1,8 @@
-# IBM Cloud Functions Object Storage Bandwidth Benchmark
+# IBM Cloud Functions - COS Bandwidth Benchmark (us-east)
+# Date: 22/12/2020
+--------
 
-## Total Concurrency: 100 - Object Size: 512MB - Runtime Memory: 1024MB - Date: 11/09/2020
+## Total Parallelism: 100 - Object Size: 512MB - Runtime Memory: 1024MB
 ### Execution Histogram | Write/Read Rates | Aggregate Bandwidth
 <p align="center">
   <img width="33%" src="100_execution.png"></img>
@@ -9,7 +11,7 @@
 </p>
 
 
-## Total Concurrency: 1000 - Object Size: 512MB - Runtime Memory: 1024MB - Date: 11/09/2020
+## Total Parallelism: 1000 - Object Size: 512MB - Runtime Memory: 1024MB
 ### Execution Histogram | Write/Read Rates | Aggregate Bandwidth
 <p align="center">
   <img width="33%" src="1000_execution.png"></img>
