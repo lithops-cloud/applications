@@ -25,6 +25,8 @@ from plots import create_execution_histogram, create_rates_histogram, create_tot
 
 def compute_flops(loopcount, MAT_N):
 
+    time.sleep(60)
+
     A = np.arange(MAT_N**2, dtype=np.float64).reshape(MAT_N, MAT_N)
     B = np.arange(MAT_N**2, dtype=np.float64).reshape(MAT_N, MAT_N)
 
@@ -37,10 +39,10 @@ def compute_flops(loopcount, MAT_N):
     return {'flops': FLOPS / (end-start)}
 
 
-def benchmark(workers, memory, loopcount, matn):
-    iterable = [(loopcount, matn) for i in range(workers)]
+def benchmark(backend, tasks, memory, loopcount, matn):
+    iterable = [(loopcount, matn) for i in range(tasks)]
 
-    fexec = FunctionExecutor(runtime_memory=memory)
+    fexec = FunctionExecutor(backend=backend, runtime_memory=memory)
     start_time = time.time()
     worker_futures = fexec.map(compute_flops, iterable)
     results = fexec.get_result()
@@ -50,7 +52,7 @@ def benchmark(workers, memory, loopcount, matn):
     total_time = end_time-start_time
 
     print("Total time:", round(total_time, 3))
-    est_flops = workers * 2 * loopcount * matn ** 3
+    est_flops = tasks * 2 * loopcount * matn ** 3
     print('Estimated GFLOPS:', round(est_flops / 1e9 / total_time, 4))
 
     res = {'start_time': start_time,
@@ -69,17 +71,19 @@ def create_plots(data, outdir, name):
 
 
 @click.command()
-@click.option('--workers', default=10, help='how many workers', type=int)
+@click.option('--backend', help='backend name', type=str)
+@click.option('--tasks', default=10, help='how many tasks', type=int)
 @click.option('--memory', default=1024, help='Memory per worker in MB', type=int)
 @click.option('--outdir', default='.', help='dir to save results in')
-@click.option('--name', default='flops_benchmark', help='filename to save results in')
+@click.option('--name', help='filename to save results in')
 @click.option('--loopcount', default=6, help='Number of matmuls to do.', type=int)
 @click.option('--matn', default=1024, help='size of matrix', type=int)
-def run_benchmark(workers, memory, outdir, name, loopcount, matn):
+def run_benchmark(backend, tasks, memory, outdir, name, loopcount, matn):
+    name = '{}_flops_benchmark'.format(tasks) if name is None else name
     if True:
-        res = benchmark(workers, memory, loopcount, matn)
+        res = benchmark(backend, tasks, memory, loopcount, matn)
         res['loopcount'] = loopcount
-        res['workers'] = workers
+        res['workers'] = tasks
         res['MATN'] = matn
         pickle.dump(res, open('{}/{}.pickle'.format(outdir, name), 'wb'))
     else:
