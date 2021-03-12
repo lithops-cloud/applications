@@ -36,7 +36,7 @@ def load_data(mib):
 
 @click.command()
 @click.option('--backend', default='loky', help='Joblib backend to perform grid search '
-                                                '(loky | cloudbutton | dask | ray | tune)')
+                                                '(loky | lithops | dask | ray | tune)')
 @click.option('--address', default=None, help='Scheduler address (dask) or head node address '
                                               '(ray, ray[tune])')
 @click.option('--mib', default=10, type=int, help='Load X MiB from the dataset')
