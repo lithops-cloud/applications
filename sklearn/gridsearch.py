@@ -42,7 +42,9 @@ def load_data(mib):
 @click.option('--mib', default=10, type=int, help='Load X MiB from the dataset')
 @click.option('--refit', default=False, is_flag=True, help='Fit the final model with the best '
                                                            'configuration and print score')
-def main(backend, address, mib, refit):
+@click.option('--jobs', default=-1, help='Number of jobs to execute the search. -1 means all processors.')
+
+def main(backend, address, mib, refit, jobs):
 
     X, y = load_data(mib)
 
@@ -66,7 +68,7 @@ def main(backend, address, mib, refit):
         register_lithops()
         grid_search = GridSearchCV(pipeline, parameters,
                                    error_score='raise',
-                                   refit=refit, cv=5, n_jobs=-1)
+                                   refit=refit, cv=5, n_jobs=jobs)
 
     elif backend == 'ray':
         from sklearn.model_selection import GridSearchCV
@@ -77,7 +79,7 @@ def main(backend, address, mib, refit):
         register_ray()
         grid_search = GridSearchCV(pipeline, parameters,
                                    error_score='raise',
-                                   refit=refit, cv=5, n_jobs=-1)
+                                   refit=refit, cv=5, n_jobs=jobs)
 
     elif backend == 'tune':
         from tune_sklearn import TuneGridSearchCV
@@ -85,7 +87,7 @@ def main(backend, address, mib, refit):
         address = 'auto' if address is None else address
         ray.init(address, log_to_driver=False, redis_password='5241590000000000')
         grid_search = TuneGridSearchCV(pipeline, parameters,
-            error_score='raise', refit=refit, cv=5, n_jobs=-1)
+            error_score='raise', refit=refit, cv=5, n_jobs=jobs)
         backend = 'loky' # not used
 
     elif backend == 'dask':
@@ -101,12 +103,12 @@ def main(backend, address, mib, refit):
             ('clf', SGDClassifier()),
         ])
         grid_search = GridSearchCV(pipeline, parameters,
-            error_score='raise', refit=refit, cv=5, n_jobs=-1)
+            error_score='raise', refit=refit, cv=5, n_jobs=jobs)
 
     else:   # loky
         from sklearn.model_selection import GridSearchCV
         grid_search = GridSearchCV(pipeline, parameters,
-            error_score='raise', refit=refit, cv=5, n_jobs=-1)
+            error_score='raise', refit=refit, cv=5, n_jobs=jobs)
 
     print("pipeline:", [name for name, _ in pipeline.steps])
     print("parameters: ", end='')
