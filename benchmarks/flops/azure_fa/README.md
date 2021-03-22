@@ -1,12 +1,12 @@
 # Microsoft Azure Functions Flops Benchmark
 
 
-## Total Concurrency: 100 - Runtime Memory: 1024MB - Date: 13/05/2020
+## Total Concurrency: 100 - Runtime Memory: 1024MB - Date: 22/03/2021
 ### Execution Histogram | GFLOP Rates | Peak and Effective GFLOPS
 <p align="center">
-  <img width="33%" src="100_execution.png"></img>
-  <img width="33%" src="100_rates.png"></img>
-  <img width="33%" src="100_gflops.png"></img>
+  <img width="33%" src="100_flops_execution.png"></img>
+  <img width="33%" src="100_flops_rates.png"></img>
+  <img width="33%" src="100_flops_gflops.png"></img>
 </p>
 
 

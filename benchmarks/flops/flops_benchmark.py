@@ -24,9 +24,6 @@ from plots import create_execution_histogram, create_rates_histogram, create_tot
 
 
 def compute_flops(loopcount, MAT_N):
-
-    time.sleep(60)
-
     A = np.arange(MAT_N**2, dtype=np.float64).reshape(MAT_N, MAT_N)
     B = np.arange(MAT_N**2, dtype=np.float64).reshape(MAT_N, MAT_N)
 
@@ -39,10 +36,10 @@ def compute_flops(loopcount, MAT_N):
     return {'flops': FLOPS / (end-start)}
 
 
-def benchmark(backend, tasks, memory, loopcount, matn):
+def benchmark(backend, storage, tasks, memory, loopcount, matn):
     iterable = [(loopcount, matn) for i in range(tasks)]
 
-    fexec = FunctionExecutor(backend=backend, runtime_memory=memory)
+    fexec = FunctionExecutor(backend=backend, storage=storage, runtime_memory=memory)
     start_time = time.time()
     worker_futures = fexec.map(compute_flops, iterable)
     results = fexec.get_result()
@@ -71,17 +68,18 @@ def create_plots(data, outdir, name):
 
 
 @click.command()
-@click.option('--backend', help='backend name', type=str)
+@click.option('--backend', default=None, help='compute backend name', type=str)
+@click.option('--storage', default=None, help='storage backend name', type=str)
 @click.option('--tasks', default=10, help='how many tasks', type=int)
 @click.option('--memory', default=1024, help='Memory per worker in MB', type=int)
 @click.option('--outdir', default='.', help='dir to save results in')
 @click.option('--name', help='filename to save results in')
 @click.option('--loopcount', default=6, help='Number of matmuls to do.', type=int)
 @click.option('--matn', default=1024, help='size of matrix', type=int)
-def run_benchmark(backend, tasks, memory, outdir, name, loopcount, matn):
-    name = '{}_flops_benchmark'.format(tasks) if name is None else name
+def run_benchmark(backend, storage, tasks, memory, outdir, name, loopcount, matn):
+    name = '{}_flops'.format(tasks) if name is None else name
     if True:
-        res = benchmark(backend, tasks, memory, loopcount, matn)
+        res = benchmark(backend, storage, tasks, memory, loopcount, matn)
         res['loopcount'] = loopcount
         res['workers'] = tasks
         res['MATN'] = matn
