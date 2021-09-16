@@ -61,9 +61,9 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 ```
 There are 2 major functions in this example:
 
-**analyze_comments:** It is used as the map function in map reduce paradigm. The function parses the dataset and classifies the reviews using nltk by their polarity scores and groups them by being positive, negative or neutral. 
+- **analyze_comments:** It is used as the map function in map reduce paradigm. The function parses the dataset and classifies the reviews using nltk by their polarity scores and groups them by being positive, negative or neutral. 
 
-**create_map:** This method functions as the reduce function in this scenario. It reduces all the intermediate data grouped by sentiments and draws a map displaying the results in different colors accordingly.
+- **create_map:** This method functions as the reduce function in this scenario. It reduces all the intermediate data grouped by sentiments and draws a map displaying the results in different colors accordingly.
 
 ## Lithops configuration
 
