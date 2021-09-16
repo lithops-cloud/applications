@@ -1,42 +1,54 @@
-# Pi Estimation with Monte Carlo Method
 
-In this application, a Monte Carlo simulation is performed with Lithops over Cloud Functions to estimate the value of the number pi. It is a demonstration of how lithops can be used for these kind of computations.
+# Stock Prediction with Monte Carlo Method
+
+In this application, a Monte Carlo simulation is performed with Lithops over Cloud Functions to perform a stock prediction operation. It is a demonstration of how lithops can be used for these kind of computations.
 
 ## How is Monte Carlo Algorithm Used?
 
-![pi](https://upload.wikimedia.org/wikipedia/commons/8/84/Pi_30K.gif)
 
-
-In this example, the alue of the number pi is being estimated using Monte Carlo method. Monte Carlo methods are a broad class of computational algorithms that rely on repeated random sampling to obtain numerical results. For estimation of pi it works like this:
-- 1. Fit a quadrant inside a square area.
-- 2. Generate random points/ numbers along this area.
-- 3. Calculate the numbers of the points that are in the quadrant
-- 4. Calculate the ratio of number of points inside the quadrant to total number of points.
-- 5. Multiply the ratio by 4 and this result is the estimation of pi.
+This notebook contains an example of stock prediction with Monte Carlo. The goal of this notebook is to demonstrate how IBM Cloud Functions can benefit Monte Carlo simulations and not how stock prediction works. As stock prediction is very complicated and requires many prior knowledge and correct models, we did not innovate the Monte Carlo Method for handling the unpredictability of stock prices, nor do we provide any results for prediction based on long term data sources.
 
 ## Running the code
 - You need an IBM Cloud account and IBM Cloud Functions with IBM Cloud Object Storage.
 - An Object storage bucket is needed to run this example.
 - You have to be sure that lithops is installed and works fine.
+### Installing the dependencies
+```python
+import numpy as np
+import sys
+from time import time
+import matplotlib.pyplot as plt
+import scipy.stats as scpy
+import logging
 
+#Install Lithops
+try:
+    import lithops
+except:
+    !{sys.executable} -m pip install lithops
+    import lithops
+```
 ### Implementation of Monte Carlo simulation
 
-'EstimatePI' is a Python class that we use to represent a single PI estimation. You may configure the following parameters:
+'StockData' is a Python class that we use to represent a single stock. You may configure the following parameters:
 
 **MAP_INSTANCES:** 
-number of IBM Cloud Function invocations. Default is 100  
+number of IBM Cloud Function invocations. Default is 1000
 
-**randomize_per_map:**
-number of points to random in a single invocation. Default is 10,000,000
+**forecasts_per_map:**
+forecasts_per_map - number of forecasts to run in a single invocation. Default is 100
+
+**day2predict:**
+number of days to predict for each forecast. Default is 730 days
 
 Our code contains two major Python methods:
 
-**randomize_points(self,data=None)**
-a function to random number of points and return the percentage of points that inside the circle  
+**process_forecasts(data=None):**
+a function to process number of forecasts and
+  days as configured. (aka "map" in map-reduce paradigm) 
 
 **process_in_circle_points(self, results, futures):**
- summarize results of all randomize_points executions (aka "reduce" in map-reduce paradigm)
-All your files and folders are presented as a tree in the file explorer. You can switch from one to another by clicking a file in the tree.
+summarize results of all process_forecasts executions (aka "reduce" in map-reduce paradigm)
 
 ### Lithops Configuration
 
@@ -55,7 +67,13 @@ config = {'lithops': {'backend': 'ibm_cf', 'storage': 'ibm_cos'},
                       'region': '<BUCKET_REGION>',
                       'api_key': '<YOUR_API_KEY>'}}
 ```               
-### Execution of simulation and conclusion
+### Input data on the past stock prices
+This step is mandatory to run our example. The raw stock daily data need to be prepared prior used by the code. You can follow the next steps to create different input data. You may use any spreadsheet for this process or any other tool.
+- Fetch historical daily value of the stock from some reliable finance website
+- Calculate ln() function of two consecutive days ln (today price / yesterday price )
+- Calculate the variance 'var', the average 'u' and standard deviation of the previous results
+- Calculate the drift by equation drift = u - (var^2 / 2 )
 
-After getting the config and everything ready, a FunctionExecutor is created with the config provided in code. Here lithops' map_reduce function is called with *randomize_points* as map function and *process_in_circle_points* as the reduce function.
-Then 1,000,000,000 points are generated and calculated if it is in the circular area parallelly.  Here we took advantage of cloud functions with lithops to use outer sources for performing a vast amount of random computation and in a scenerio where we paid for the machine or sources, we would have been paying just for the time spent for computation itself. As it is shown below it is 211 seconds for 100 IBM Cloud Functions with 1,000,000,000 random generations and calculations.
+### Execution of simulation and conclusion
+After getting the config and everything ready, a FunctionExecutor is created with the config provided in code. Here lithops' map_reduce function is called with *process_forecasts* as map function and *combine_forecasts* as the reduce function.
+Then numbers of functions are performed parallelly.  Then with the result a graph is being drawen showing predicted prices and number of forecasts to predict them. Here we took advantage of cloud functions with lithops to use outer sources for performing a vast amount of random computation and in a scenerio where we paid for the machine or sources, we would have been paying just for the time spent for computation itself. 
