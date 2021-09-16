@@ -1,6 +1,6 @@
-## AirBnB sentiment analysis of the comments from multiple cities
+# AirBnB sentiment analysis of the comments from multiple cities
 
-Login to the [IBM Watson Studio](https://dataplatform.cloud.ibm.com/), Download the Airbnb dataset, and upload it to a COS bucket:
+Login to the [IBM Watson Studio](https://dataplatform.cloud.ibm.com/), first you need to activate watson services on your account to access the download links below. After downloading the Airbnb dataset, upload it to a COS bucket. The dataset consists of information -like review, reviewer info, coordinates- of the reviews from Airbnb.
 
 1. [Amsterdam](https://dataplatform.cloud.ibm.com/api/exchange/actions/download-dataset/107ab470f90be9a4815791d8ec829133)
 2. [Antwerp Belgium](https://dataplatform.cloud.ibm.com/api/exchange/actions/download-dataset/9fc8543fabfc26f908cf0c592c89d137)
@@ -35,3 +35,48 @@ Login to the [IBM Watson Studio](https://dataplatform.cloud.ibm.com/), Download 
 31. [Venice Italy](https://dataplatform.cloud.ibm.com/api/exchange/actions/download-dataset/907ad5190de7a698ecd285f10efc4f45)
 32. [Vienna Austria.](https://dataplatform.cloud.ibm.com/api/exchange/actions/download-dataset/f2f07c6b6d8bb541a5785c6f1c06fdd2)
 33. [Washington D.C.](https://dataplatform.cloud.ibm.com/api/exchange/actions/download-dataset/c3af8034bd7f7374f87b3df64209f055)
+
+
+## How to run the application
+
+First, you need to install required packages. 
+
+```python
+import io
+import base64
+import time
+import shutil
+import csv
+import lithops
+import regex
+import re
+import matplotlib.pyplot as plt
+import nltk
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+```
+ Then you should set the BUCKET variable as the name of the bucket which you uploaded the dataset.
+ 
+```python
+ BUCKET = ['<YOUR_BUCKET_NAME>']
+```
+There are 2 major functions in this example:
+
+- **analyze_comments:** It is used as the map function in map reduce paradigm. The function parses the dataset and classifies the reviews using nltk by their polarity scores and groups them by being positive, negative or neutral. 
+
+- **create_map:** This method functions as the reduce function in this scenario. It reduces all the intermediate data grouped by sentiments and draws a map displaying the results in different colors accordingly.
+
+## Lithops configuration
+
+You need to configure lithops with your own IBM account keys. You can also see more options about the configuration [here](https://github.com/lithops-cloud/lithops/tree/master/config).
+```python
+config = {'lithops': {'backend': 'ibm_cf', 'storage': 'ibm_cos'},
+          'ibm': {'iam_api_key': '<IAM_API_KEY>'},# If your namespace is IAM based (To reach cloud functions API without cf api key)
+          'ibm_cf':  {'endpoint': '<CLOUD_FUNCTIONS_ENDPOINT>',
+                      'namespace': '<NAME_OF_YOUR_NAMESPACE>',
+                      'namespace_id': '<GUID_OF_YOUR_NAMESPACE>'# If your namespace is IAM based
+                      #'api_key': 'YOUR_API_KEY' #If your namespace is foundary based
+                     },
+          'ibm_cos': {'storage_bucket': '<YOUR_COS_BUCKET_NAME>',
+                      'region': '<BUCKET_REGION>',
+                      'api_key': '<YOUR_API_KEY>'}}
+```
