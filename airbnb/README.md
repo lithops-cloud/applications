@@ -57,7 +57,7 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
  Then you should set the BUCKET variable as the name of the bucket which you uploaded the dataset.
  
 ```python
- BUCKET = [<YOUR_BUCKET_NAME>]
+ BUCKET = ['<YOUR_BUCKET_NAME>']
 ```
 There are 2 major functions in this example:
 **analyze_comments:** It is used as the map function in map reduce paradigm. The function parses the dataset and classifies the reviews using nltk by their polarity scores and groups them by being positive, negative or neutral. 
