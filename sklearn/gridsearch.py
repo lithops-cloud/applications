@@ -58,7 +58,7 @@ def main(backend, address, mib, refit, jobs):
         'vect__norm': ('l1', 'l2'),
         'vect__ngram_range': ((1, 1), (1, 2)),
         'clf__alpha': (1e-2, 1e-3, 1e-4, 1e-5),
-        'clf__max_iter': (10, 30, 50, 80),
+        'clf__max_iter': (20, 60, 100, 160),
         'clf__penalty': ('l2', 'l1', 'elasticnet')
     }
 
