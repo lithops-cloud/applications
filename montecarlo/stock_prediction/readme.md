@@ -1,4 +1,3 @@
-
 # Stock Prediction with Monte Carlo Method
 
 In this application, a Monte Carlo simulation is performed with Lithops over Cloud Functions to perform a stock prediction operation. It is a demonstration of how lithops can be used for these kind of computations.
