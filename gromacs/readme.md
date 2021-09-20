@@ -16,8 +16,7 @@ import time
 import wget
 import json
 ```
-
-You need access to dockerhub to use the runtime used in the program, or you can build your own runtime following the instructions [here](https://github.com/lithops-cloud/lithops/tree/master/runtime/ibm_cf). If you created your own runtime don't forget to replace the line below with your `docker_username/runtimename:tag`.
+Currently, the runtime cactusone/lithops-gromacs:1.0.2 uses Python3.8, so you must run the application with Python3.8. You need access to dockerhub to use the runtime used in the program, or you can build your own runtime following the instructions [here](https://github.com/lithops-cloud/lithops/tree/master/runtime/ibm_cf). If you created your own runtime don't forget to replace the line below with your `docker_username/runtimename:tag`.
 ```python
 fexec  =  lithops.FunctionExecutor(runtime='cactusone/lithops-gromacs:1.0.2', runtime_memory=2048)
 ```
