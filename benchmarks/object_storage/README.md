@@ -3,5 +3,5 @@
 Execution example:
 
 ```
-python3 os_benchmark.py run --mb_per_file=512 --bucket_name=cb-bench-data --number=100 --outdir=ibm_cos --name=100
+python3 os_benchmark.py run -b aws_lambda -s aws_s3 --mb_per_file=512 --bucket_name=bench-data --number=100 --outdir=aws_s3
 ```
