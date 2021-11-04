@@ -51,12 +51,12 @@ def sh_cmd_executor(x, param1, ibm_cos):
 
 
 if __name__ == '__main__':
-    # Example of using bechMEM from https://www.mpibpc.mpg.de/grubmueller/bench
+    # Example of using benchMEM from https://www.mpibpc.mpg.de/grubmueller/bench
 
     param1 = 'param1 example'
 
     total_start = time.time()
-    fexec = lithops.FunctionExecutor(runtime='cactusone/lithops-gromacs:1.0.2', runtime_memory=2048)
+    fexec = lithops.FunctionExecutor(runtime='ecenurarslan/gromacs-runtime:0.1', runtime_memory=2048)
     fexec.map(sh_cmd_executor, iterdata, extra_args=(param1,))
     res = fexec.get_result()
     fexec.clean()
