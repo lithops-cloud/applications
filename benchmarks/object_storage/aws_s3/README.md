@@ -1,6 +1,6 @@
 # AWS S3 Bandwidth Benchmark
 
-## Total Concurrency: 100 - Object Size: 512MB - Runtime Memory: 1536MB - Date: 05/11/2021
+## Total Concurrency: 100 - Object Size: 512MB - Runtime Memory: 1536MB - Date: 10/06/2022
 ### Execution Histogram | Write/Read Rates | Aggregate Bandwidth
 <p align="center">
   <img width="33%" src="100_execution.png"></img>
@@ -9,7 +9,7 @@
 </p>
 
 
-## Total Concurrency: 1000 - Object Size: 512MB - Runtime Memory: 1536MB - Date: 05/11/2021
+## Total Concurrency: 1000 - Object Size: 512MB - Runtime Memory: 1536MB - Date: 10/06/2022
 ### Execution Histogram | Write/Read Rates | Aggregate Bandwidth
 <p align="center">
   <img width="33%" src="1000_execution.png"></img>
