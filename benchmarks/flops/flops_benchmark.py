@@ -36,10 +36,10 @@ def compute_flops(loopcount, MAT_N):
     return {'flops': FLOPS / (end-start)}
 
 
-def benchmark(backend, storage, tasks, memory, loopcount, matn):
+def benchmark(backend, storage, tasks, memory, loopcount, matn, debug):
     iterable = [(loopcount, matn) for i in range(tasks)]
-
-    fexec = FunctionExecutor(backend=backend, storage=storage, runtime_memory=memory)
+    log_level = 'INFO' if not debug else 'DEBUG'
+    fexec = FunctionExecutor(backend=backend, storage=storage, runtime_memory=memory, log_level=log_level)
     start_time = time.time()
     worker_futures = fexec.map(compute_flops, iterable)
     results = fexec.get_result()
@@ -76,10 +76,11 @@ def create_plots(data, outdir, name):
 @click.option('--name', help='filename to save results in')
 @click.option('--loopcount', default=6, help='Number of matmuls to do.', type=int)
 @click.option('--matn', default=1024, help='size of matrix', type=int)
-def run_benchmark(backend, storage, tasks, memory, outdir, name, loopcount, matn):
+@click.option('--debug', '-d', is_flag=True, help='debug mode')
+def run_benchmark(backend, storage, tasks, memory, outdir, name, loopcount, matn, debug):
     name = '{}_flops'.format(tasks) if name is None else name
     if True:
-        res = benchmark(backend, storage, tasks, memory, loopcount, matn)
+        res = benchmark(backend, storage, tasks, memory, loopcount, matn, debug)
         res['loopcount'] = loopcount
         res['workers'] = tasks
         res['MATN'] = matn
