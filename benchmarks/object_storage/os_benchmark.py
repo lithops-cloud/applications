@@ -127,7 +127,7 @@ def write(backend, storage, bucket_name, mb_per_file, number, key_prefix):
     # create list of random keys
     keynames = [key_prefix + str(uuid.uuid4().hex.upper()) for unused in range(number)]
 
-    fexec = FunctionExecutor(backend=backend, storage=storage, runtime_memory=1536)
+    fexec = FunctionExecutor(backend=backend, storage=storage, runtime_memory=1024)
     start_time = time.time()
     worker_futures = fexec.map(write_object, keynames)
     results = fexec.get_result()
@@ -181,7 +181,7 @@ def read(backend, storage, bucket_name, number, keylist_raw, read_times):
     else:
         keynames = [keylist_raw[i % len(keylist_raw)] for i in range(number)]
 
-    fexec = FunctionExecutor(backend=backend, storage=storage, runtime_memory=1536)
+    fexec = FunctionExecutor(backend=backend, storage=storage, runtime_memory=1024)
     start_time = time.time()
     worker_futures = fexec.map(read_object, keynames)
     results = fexec.get_result()

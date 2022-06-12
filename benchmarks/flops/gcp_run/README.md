@@ -1,7 +1,7 @@
 # Google Cloud Run Flops Benchmark
 
 
-## Total Concurrency: 100 - Runtime Memory: 1024MB - Date: 23/5/2020
+## Total Concurrency: 100 - Runtime Memory: 1024MB - Date: 12/06/2022
 ### Execution Histogram | GFLOP Rates | Peak and Effective GFLOPS
 <p align="center">
   <img width="33%" src="100_execution.png"></img>
@@ -10,7 +10,7 @@
 </p>
 
 
-## Total Concurrency: 1000 - Runtime Memory: 1024MB - Date: 23/5/2020
+## Total Concurrency: 1000 - Runtime Memory: 1024MB - Date: 12/06/2022
 ### Execution Histogram | GFLOP Rates | Peak and Effective GFLOPS
 <p align="center">
   <img width="33%" src="1000_execution.png"></img>

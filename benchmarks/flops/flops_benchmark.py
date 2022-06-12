@@ -23,7 +23,7 @@ from lithops import FunctionExecutor
 from plots import create_execution_histogram, create_rates_histogram, create_total_gflops_plot
 
 
-def compute_flops(loopcount, MAT_N):
+def compute_flops(loopcount, MAT_N, ti):
     A = np.arange(MAT_N**2, dtype=np.float64).reshape(MAT_N, MAT_N)
     B = np.arange(MAT_N**2, dtype=np.float64).reshape(MAT_N, MAT_N)
 
@@ -32,12 +32,15 @@ def compute_flops(loopcount, MAT_N):
         c = np.sum(np.dot(A, B))
 
     FLOPS = 2 * MAT_N**3 * loopcount
+    
     end = time.time()
+    
+    print("%d finished"%(ti))
     return {'flops': FLOPS / (end-start)}
 
 
 def benchmark(backend, storage, tasks, memory, loopcount, matn):
-    iterable = [(loopcount, matn) for i in range(tasks)]
+    iterable = [(loopcount, matn, i) for i in range(tasks)]
 
     fexec = FunctionExecutor(backend=backend, storage=storage, runtime_memory=memory)
     start_time = time.time()
