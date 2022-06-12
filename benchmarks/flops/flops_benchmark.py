@@ -32,7 +32,9 @@ def compute_flops(loopcount, MAT_N):
         c = np.sum(np.dot(A, B))
 
     FLOPS = 2 * MAT_N**3 * loopcount
+    
     end = time.time()
+    
     return {'flops': FLOPS / (end-start)}
 
 
