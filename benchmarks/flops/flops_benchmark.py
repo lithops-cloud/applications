@@ -73,7 +73,7 @@ def create_plots(data, outdir, name):
 @click.option('--backend', default=None, help='compute backend name', type=str)
 @click.option('--storage', default=None, help='storage backend name', type=str)
 @click.option('--tasks', default=10, help='how many tasks', type=int)
-@click.option('--memory', default=1536, help='Memory per worker in MB', type=int)
+@click.option('--memory', default=1024, help='Memory per worker in MB', type=int)
 @click.option('--outdir', default='.', help='dir to save results in')
 @click.option('--name', help='filename to save results in')
 @click.option('--loopcount', default=6, help='Number of matmuls to do.', type=int)
