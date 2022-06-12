@@ -23,7 +23,7 @@ from lithops import FunctionExecutor
 from plots import create_execution_histogram, create_rates_histogram, create_total_gflops_plot
 
 
-def compute_flops(loopcount, MAT_N, ti):
+def compute_flops(loopcount, MAT_N):
     A = np.arange(MAT_N**2, dtype=np.float64).reshape(MAT_N, MAT_N)
     B = np.arange(MAT_N**2, dtype=np.float64).reshape(MAT_N, MAT_N)
 
@@ -35,12 +35,11 @@ def compute_flops(loopcount, MAT_N, ti):
     
     end = time.time()
     
-    print("%d finished"%(ti))
     return {'flops': FLOPS / (end-start)}
 
 
 def benchmark(backend, storage, tasks, memory, loopcount, matn):
-    iterable = [(loopcount, matn, i) for i in range(tasks)]
+    iterable = [(loopcount, matn) for i in range(tasks)]
 
     fexec = FunctionExecutor(backend=backend, storage=storage, runtime_memory=memory)
     start_time = time.time()
@@ -74,7 +73,7 @@ def create_plots(data, outdir, name):
 @click.option('--backend', default=None, help='compute backend name', type=str)
 @click.option('--storage', default=None, help='storage backend name', type=str)
 @click.option('--tasks', default=10, help='how many tasks', type=int)
-@click.option('--memory', default=1024, help='Memory per worker in MB', type=int)
+@click.option('--memory', default=1536, help='Memory per worker in MB', type=int)
 @click.option('--outdir', default='.', help='dir to save results in')
 @click.option('--name', help='filename to save results in')
 @click.option('--loopcount', default=6, help='Number of matmuls to do.', type=int)
