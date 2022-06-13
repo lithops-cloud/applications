@@ -1,5 +1,5 @@
 # IBM Cloud Functions - Flops Benchmark (us-east)
-# Date: 11/06/2022
+# Date: 13/06/2022
 --------
 
 ## Total Parallelism: 100 - Runtime Memory: 1024MB

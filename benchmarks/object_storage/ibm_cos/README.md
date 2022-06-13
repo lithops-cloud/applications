@@ -1,5 +1,5 @@
 # IBM Cloud Functions - COS Bandwidth Benchmark (us-east)
-# Date: 22/12/2020
+# Date: 13/06/2022
 --------
 
 ## Total Parallelism: 100 - Object Size: 512MB - Runtime Memory: 1024MB
