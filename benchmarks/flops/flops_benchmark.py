@@ -38,27 +38,31 @@ def compute_flops(loopcount, MAT_N):
     return {'flops': FLOPS / (end-start)}
 
 
-def benchmark(backend, storage, tasks, memory, loopcount, matn, debug):
-    iterable = [(loopcount, matn) for i in range(tasks)]
+def benchmark(backend, storage, workers, memory, loopcount, matn, debug):
+    iterable = [(loopcount, matn) for i in range(workers)]
     log_level = 'INFO' if not debug else 'DEBUG'
     fexec = FunctionExecutor(backend=backend, storage=storage, runtime_memory=memory, log_level=log_level)
     start_time = time.time()
     worker_futures = fexec.map(compute_flops, iterable)
-    results = fexec.get_result()
+    results = fexec.get_result(throw_except=False)
     end_time = time.time()
-
-    worker_stats = [f.stats for f in worker_futures]
+    results = [flops for flops in results if flops is not None]
+    worker_stats = [f.stats for f in worker_futures if not f.error]
     total_time = end_time-start_time
-
+    
     print("Total time:", round(total_time, 3))
-    est_flops = tasks * 2 * loopcount * matn ** 3
+    toal_executed_tasks = len(worker_stats)
+    est_flops = toal_executed_tasks * 2 * loopcount * matn ** 3
     print('Estimated GFLOPS:', round(est_flops / 1e9 / total_time, 4))
 
     res = {'start_time': start_time,
            'total_time': total_time,
            'est_flops': est_flops,
            'worker_stats': worker_stats,
-           'results': results}
+           'results': results,
+           'workers': toal_executed_tasks,
+           'loopcount': loopcount,
+           'MATN': matn}
 
     return res
 
@@ -83,12 +87,9 @@ def run_benchmark(backend, storage, tasks, memory, outdir, name, loopcount, matn
     name = '{}_flops'.format(tasks) if name is None else name
     if True:
         res = benchmark(backend, storage, tasks, memory, loopcount, matn, debug)
-        res['loopcount'] = loopcount
-        res['workers'] = tasks
-        res['MATN'] = matn
-        pickle.dump(res, open('{}/{}.pickle'.format(outdir, name), 'wb'))
+        pickle.dump(res, open(f'{outdir}/{name}.pickle', 'wb'))
     else:
-        res = pickle.load(open('{}/{}.pickle'.format(outdir, name), 'rb'))
+        res = pickle.load(open(f'{outdir}/{name}.pickle', 'rb'))
     create_plots(res, outdir, name)
 
 
