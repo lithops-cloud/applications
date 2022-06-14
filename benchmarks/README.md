@@ -4,7 +4,7 @@ FaaS Service Flops benchmark:
 
 - [IBM Cloud Functions](flops/ibm_cf)
 - [AWS Lambda](flops/aws_lambda)
-- [Microsoft Azure Function Apps](flops/azure_functions)
+- [Microsoft Azure Functions](flops/azure_functions)
 - [Microsoft Azure Container Apps](flops/azure_containers)
 - [Google Cloud Functions](flops/gcp_functions)
 - [Google Cloud Run](flops/gcp_run)

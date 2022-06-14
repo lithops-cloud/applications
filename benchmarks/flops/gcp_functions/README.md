@@ -1,7 +1,6 @@
 # GCP Functions Flops Benchmark
 
-
-## Total Concurrency: 100 - Runtime Memory: 1024MB - Date: 09/06/2021
+## Total Invocations: 100 - Runtime Memory: 1024MB - Date: 09/06/2021
 ### Execution Histogram | GFLOP Rates | Peak and Effective GFLOPS
 <p align="center">
   <img width="33%" src="100_flops_execution.png"></img>
@@ -10,7 +9,7 @@
 </p>
 
 
-## Total Concurrency: 1000 - Runtime Memory: 1024MB - Date: 09/06/2022
+## Total Invocations: 1000 - Runtime Memory: 1024MB - Date: 09/06/2022
 ### Execution Histogram | GFLOP Rates | Peak and Effective GFLOPS
 <p align="center">
   <img width="33%" src="1000_flops_execution.png"></img>
