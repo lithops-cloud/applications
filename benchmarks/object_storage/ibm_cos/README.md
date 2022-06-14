@@ -2,7 +2,7 @@
 # Date: 13/06/2022
 --------
 
-## Total Parallelism: 100 - Object Size: 512MB - Runtime Memory: 1024MB
+## Total Invocations: 100 - Object Size: 512MB - Runtime Memory: 1024MB
 ### Execution Histogram | Write/Read Rates | Aggregate Bandwidth
 <p align="center">
   <img width="33%" src="100_execution.png"></img>
@@ -11,7 +11,7 @@
 </p>
 
 
-## Total Parallelism: 1000 - Object Size: 512MB - Runtime Memory: 1024MB
+## Total Invocations: 1000 - Object Size: 512MB - Runtime Memory: 1024MB
 ### Execution Histogram | Write/Read Rates | Aggregate Bandwidth
 <p align="center">
   <img width="33%" src="1000_execution.png"></img>

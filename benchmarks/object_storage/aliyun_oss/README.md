@@ -1,6 +1,6 @@
 # Aliyun Function Compute Object Storage Bandwidth Benchmark
 
-## Total Concurrency: 100 - Object Size: 512MB - Runtime Memory: 1024MB - Date: 14/05/2020
+## Total Invocations: 100 - Object Size: 512MB - Runtime Memory: 1024MB - Date: 14/05/2020
 ### Execution Histogram | Write/Read Rates | Aggregate Bandwidth
 <p align="center">
   <img width="33%" src="100_execution.png"></img>
@@ -9,7 +9,7 @@
 </p>
 
 
-## Total Concurrency: 1000 - Object Size: 512MB - Runtime Memory: 1024MB - Date: 14/05/2020
+## Total Invocations: 1000 - Object Size: 512MB - Runtime Memory: 1024MB - Date: 14/05/2020
 ### Execution Histogram | Write/Read Rates | Aggregate Bandwidth
 <p align="center">
   <img width="33%" src="1000_execution.png"></img>
