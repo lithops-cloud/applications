@@ -1,4 +1,4 @@
-# GCP Functions Flops Benchmark
+# GCP Functions - Flops Benchmark (us-east1)
 
 
 ## Total Concurrency: 100 - Runtime Memory: 1024MB - Date: 09/06/2021
