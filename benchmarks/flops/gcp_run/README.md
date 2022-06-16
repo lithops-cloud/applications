@@ -1,4 +1,4 @@
-# Google Cloud Run Flops Benchmark
+# Google Cloud Run - Flops Benchmark (us-east1)
 
 ## Total Invocations: 100 - Runtime Memory: 1024MB - Date: 12/06/2022
 ### Execution Histogram | GFLOP Rates | Peak and Effective GFLOPS

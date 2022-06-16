@@ -1,4 +1,4 @@
-# GCP Functions Flops Benchmark
+# GCP Functions - Flops Benchmark (us-east1)
 
 ## Total Invocations: 100 - Runtime Memory: 1024MB - Date: 09/06/2021
 ### Execution Histogram | GFLOP Rates | Peak and Effective GFLOPS
