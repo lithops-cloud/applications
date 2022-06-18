@@ -14,6 +14,6 @@ Object Storage benchmark from FaaS Service:
 
 - [IBM Cloud Object Storage](object_storage/ibm_cos)
 - [AWS S3](object_storage/aws_s3)
-- [Microsoft Azure Blob](object_storage/azure_blob)
+- [Microsoft Azure Storage](object_storage/azure_storage)
 - [Google Storage](object_storage/google_storage)
 - [Alibaba Aliyun Object Storage Service](object_storage/aliyun_oss)

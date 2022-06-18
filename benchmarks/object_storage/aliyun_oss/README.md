@@ -1,4 +1,4 @@
-# Aliyun Function Compute Object Storage Bandwidth Benchmark
+# Aliyun Functions - Object Storage Bandwidth Benchmark (eu-west-1)
 
 ## Total Invocations: 100 - Object Size: 512MB - Runtime Memory: 1024MB - Date: 14/05/2020
 ### Execution Histogram | Write/Read Rates | Aggregate Bandwidth

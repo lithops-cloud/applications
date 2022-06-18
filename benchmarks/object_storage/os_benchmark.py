@@ -109,7 +109,7 @@ class RandomDataGenerator(object):
 runtime_bins = np.linspace(0, 50, 50)
 
 
-def write(backend, storage, bucket_name, mb_per_file, number, key_prefix):
+def write(backend, storage, bucket_name, mb_per_file, number, key_prefix, debug):
 
     def write_object(key_name, storage):
         bytes_n = mb_per_file * 1024**2
@@ -127,14 +127,15 @@ def write(backend, storage, bucket_name, mb_per_file, number, key_prefix):
     # create list of random keys
     keynames = [key_prefix + str(uuid.uuid4().hex.upper()) for unused in range(number)]
 
-    fexec = FunctionExecutor(backend=backend, storage=storage, runtime_memory=1024)
+    log_level = 'INFO' if not debug else 'DEBUG'
+    fexec = FunctionExecutor(backend=backend, storage=storage, runtime_memory=1024, log_level=log_level)
     start_time = time.time()
     worker_futures = fexec.map(write_object, keynames)
-    results = fexec.get_result()
+    results = fexec.get_result(throw_except=False)
     end_time = time.time()
-
-    worker_stats = [f.stats for f in worker_futures]
     total_time = end_time-start_time
+    results = [gbs for gbs in results if gbs is not None]
+    worker_stats = [f.stats for f in worker_futures if not f.error]
 
     res = {'start_time': start_time,
            'total_time': total_time,
@@ -146,7 +147,7 @@ def write(backend, storage, bucket_name, mb_per_file, number, key_prefix):
     return res
 
 
-def read(backend, storage, bucket_name, number, keylist_raw, read_times):
+def read(backend, storage, bucket_name, number, keylist_raw, read_times, debug):
 
     blocksize = 1024*1024
 
@@ -181,14 +182,16 @@ def read(backend, storage, bucket_name, number, keylist_raw, read_times):
     else:
         keynames = [keylist_raw[i % len(keylist_raw)] for i in range(number)]
 
-    fexec = FunctionExecutor(backend=backend, storage=storage, runtime_memory=1024)
+    log_level = 'INFO' if not debug else 'DEBUG'
+    fexec = FunctionExecutor(backend=backend, storage=storage, runtime_memory=1024, log_level=log_level)
     start_time = time.time()
     worker_futures = fexec.map(read_object, keynames)
-    results = fexec.get_result()
+    results = fexec.get_result(throw_except=False)
     end_time = time.time()
-
     total_time = end_time-start_time
-    worker_stats = [f.stats for f in worker_futures]
+
+    results = [gbs for gbs in results if gbs is not None]
+    worker_stats = [f.stats for f in worker_futures if not f.error]
 
     res = {'start_time': start_time,
            'total_time': total_time,
@@ -201,14 +204,17 @@ def read(backend, storage, bucket_name, number, keylist_raw, read_times):
 def delete_temp_data(storage, bucket_name, keynames):
     print('Deleting temp files...')
     storage = Storage(backend=storage)
-    storage.delete_objects(bucket_name, keynames)
+    try:
+        storage.delete_objects(bucket_name, keynames)
+    except:
+        pass
     print('Done!')
 
 
 def create_plots(res_write, res_read, outdir, name):
-    create_execution_histogram(res_write, res_read, "{}/{}_execution.png".format(outdir, name))
-    create_rates_histogram(res_write, res_read, "{}/{}_rates.png".format(outdir, name))
-    create_agg_bdwth_plot(res_write, res_read, "{}/{}_agg_bdwth.png".format(outdir, name))
+    create_execution_histogram(res_write, res_read, f"{outdir}/{name}_execution.png")
+    create_rates_histogram(res_write, res_read, f"{outdir}/{name}_rates.png")
+    create_agg_bdwth_plot(res_write, res_read, f"{outdir}/{name}_agg_bdwth.png")
 
 
 @click.group()
@@ -225,12 +231,13 @@ def cli():
 @click.option('--key_prefix', default='', help='Object key prefix')
 @click.option('--outdir', default='.', help='dir to save results in')
 @click.option('--name', default=None, help='filename to save results in')
-def write_command(backend, storage, bucket_name, mb_per_file, number, key_prefix, outdir, name):
+@click.option('--debug', '-d', is_flag=True, help='debug mode')
+def write_command(backend, storage, bucket_name, mb_per_file, number, key_prefix, outdir, name, debug):
     if name is None:
         name = number
     if bucket_name is None:
         raise ValueError('You must provide a bucket name within --bucket_name parameter')
-    res_write = write(backend, storage, bucket_name, mb_per_file, number, key_prefix)
+    res_write = write(backend, storage, bucket_name, mb_per_file, number, key_prefix, debug)
     pickle.dump(res_write, open('{}/{}_write.pickle'.format(outdir, name), 'wb'), -1)
 
 
@@ -242,7 +249,8 @@ def write_command(backend, storage, bucket_name, mb_per_file, number, key_prefix
 @click.option('--outdir', default='.', help='dir to save results in')
 @click.option('--name', default=None, help='filename to save results in')
 @click.option('--read_times', default=1, help="number of times to read each COS key")
-def read_command(backend, storage, key_file, number, outdir, name, read_times):
+@click.option('--debug', '-d', is_flag=True, help='debug mode')
+def read_command(backend, storage, key_file, number, outdir, name, read_times, debug):
     if name is None:
         name = number
     if key_file:
@@ -251,7 +259,7 @@ def read_command(backend, storage, key_file, number, outdir, name, read_times):
         res_write = pickle.load(open('{}/{}_write.pickle'.format(outdir, name), 'rb'))
     bucket_name = res_write['bucket_name']
     keynames = res_write['keynames']
-    res_read = read(backend, storage, bucket_name, number, keynames, read_times)
+    res_read = read(backend, storage, bucket_name, number, keynames, read_times, debug)
     pickle.dump(res_read, open('{}/{}_read.pickle'.format(outdir, name), 'wb'), -1)
 
 
@@ -279,7 +287,8 @@ def delete_command(key_file, outdir, name):
 @click.option('--outdir', default='.', help='dir to save results in')
 @click.option('--name', '-n', default=None, help='filename to save results in')
 @click.option('--read_times', default=1, help="number of times to read each COS key")
-def run(backend, storage, bucket_name, mb_per_file, number, key_prefix, outdir, name, read_times):
+@click.option('--debug', '-d', is_flag=True, help='debug mode')
+def run(backend, storage, bucket_name, mb_per_file, number, key_prefix, outdir, name, read_times, debug):
     if name is None:
         name = number
 
@@ -287,20 +296,20 @@ def run(backend, storage, bucket_name, mb_per_file, number, key_prefix, outdir, 
         print('Executing Write Test:')
         if bucket_name is None:
             raise ValueError('You must provide a bucket name within --bucket_name parameter')
-        res_write = write(backend, storage, bucket_name, mb_per_file, number, key_prefix)
-        pickle.dump(res_write, open('{}/{}_write.pickle'.format(outdir, name), 'wb'), -1)
+        res_write = write(backend, storage, bucket_name, mb_per_file, number, key_prefix, debug)
+        pickle.dump(res_write, open(f'{outdir}/{name}_write.pickle', 'wb'), -1)
         print('Sleeping 20 seconds...')
         time.sleep(20)
         print('Executing Read Test:')
         bucket_name = res_write['bucket_name']
         keynames = res_write['keynames']
-        res_read = read(backend, storage, bucket_name, number, keynames, read_times)
-        pickle.dump(res_read, open('{}/{}_read.pickle'.format(outdir, name), 'wb'), -1)
+        res_read = read(backend, storage, bucket_name, number, keynames, read_times, debug)
+        pickle.dump(res_read, open(f'{outdir}/{name}_read.pickle', 'wb'), -1)
 
         delete_temp_data(storage, bucket_name, keynames)
     else:
-        res_write = pickle.load(open('{}/{}_write.pickle'.format(outdir, name), 'rb'))
-        res_read = pickle.load(open('{}/{}_read.pickle'.format(outdir, name), 'rb'))
+        res_write = pickle.load(open(f'{outdir}/{name}_write.pickle', 'rb'))
+        res_read = pickle.load(open(f'{outdir}/{name}_read.pickle', 'rb'))
     create_plots(res_write, res_read, outdir, name)
 
 

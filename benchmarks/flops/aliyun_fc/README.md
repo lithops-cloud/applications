@@ -1,4 +1,4 @@
-# Aliyun Function Compute Flops Benchmark
+# Aliyun Function Compute Flops Benchmark (eu-west-1)
 
 ## Total Concurrency: 100 - Runtime Memory: 1024MB - Date: 15/06/2022
 ### Execution Histogram | GFLOP Rates | Peak and Effective GFLOPS
