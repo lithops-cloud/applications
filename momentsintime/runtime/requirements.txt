@@ -18,7 +18,7 @@ Twisted >= 20.3.0
 PyJWT == 2.4.0
 
 # packages for numerics
-numpy == 1.21.0
+numpy == 1.22.0
 scikit-learn == 0.20.3
 scipy == 1.2.1
 pandas == 0.24.2
