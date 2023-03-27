@@ -36,7 +36,7 @@ ibmcloudsql == 0.2.23
 # Compose Libs
 psycopg2 == 2.7.7
 pymongo == 3.8.0
-redis == 3.3.8
+redis == 4.5.3
 pika == 0.13.1
 elasticsearch == 6.3.1
 cassandra-driver == 3.18.0
