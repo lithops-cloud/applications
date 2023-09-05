@@ -129,8 +129,8 @@ def create_rates_histogram(res_write, res_read, dst):
     """
 
     fig = pylab.figure(figsize=(5, 5))
-    sns.distplot(write_rates, label='Write MB Rate', color=WRITE_COLOR, kde=False, hist_kws=dict(alpha=0.8, edgecolor="k", linewidth=1))
-    sns.distplot(read_rates, label='Read MB Rate', color=READ_COLOR, kde=False, hist_kws=dict(alpha=0.8, edgecolor="k", linewidth=1))
+    sns.histplot(write_rates, label='Write MB Rate', color=WRITE_COLOR, kde=False, alpha=0.8, edgecolor="k", linewidth=1)
+    sns.histplot(read_rates, label='Read MB Rate', color=READ_COLOR, kde=False, alpha=0.8, edgecolor="k", linewidth=1)
     pylab.legend()
     pylab.xlabel("MB/sec")
     pylab.ylabel("Total functions")
