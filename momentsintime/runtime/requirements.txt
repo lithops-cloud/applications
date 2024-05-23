@@ -1,7 +1,7 @@
 # Requirements.txt contains a list of dependencies for the Python Application #
 
 # Setup modules
-gevent == 1.4.0
+gevent == 23.9.0
 flask == 1.1.1
 
 # default available packages for python3action
