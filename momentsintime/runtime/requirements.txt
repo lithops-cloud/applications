@@ -35,7 +35,7 @@ ibmcloudsql == 0.2.23
 
 # Compose Libs
 psycopg2 == 2.7.7
-pymongo == 3.8.0
+pymongo == 4.6.3
 redis == 4.4.4
 pika == 0.13.1
 elasticsearch == 6.3.1
