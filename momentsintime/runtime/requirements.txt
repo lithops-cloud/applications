@@ -11,7 +11,7 @@ kafka_python == 1.4.6
 lxml == 4.9.1
 python-dateutil == 2.8.0
 requests == 2.31.0
-scrapy == 2.6.2
+scrapy == 2.11.2
 simplejson == 3.16.0
 virtualenv == 16.7.1
 Twisted >= 20.3.0
