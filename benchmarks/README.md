@@ -9,6 +9,12 @@ FaaS Service Flops Benchmark
 - [Google Cloud Run](flops/gcp_run)
 - [Alibaba Aliyun Function Compute](flops/aliyun_fc)
 
+PaaS Service Flops Benchmark
+- [OVH Managed Kubernetes](flops/ovhcloud_managed_k8s)
+
+CaaS Service Flops Benchmark
+- [Singularity](flops/singularity)
+
 Object Storage Benchmark from FaaS Service
 - [IBM Cloud Object Storage](object_storage/ibm_cos)
 - [AWS S3](object_storage/aws_s3)
@@ -16,6 +22,3 @@ Object Storage Benchmark from FaaS Service
 - [Google Storage](object_storage/google_storage)
 - [Alibaba Aliyun Object Storage Service](object_storage/aliyun_oss)
 - [OVH Swift](object_storage/ovhcloud_managed_k8s)
-
-PaaS Service Flops Benchmark
-- [OVH Managed Kubernetes](flops/ovhcloud_managed_k8s)
