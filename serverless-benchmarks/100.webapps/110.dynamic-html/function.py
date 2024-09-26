@@ -27,7 +27,6 @@ def benchmark(size, tasks):
     input_config = {'username': 'testname'}
     input_config['random_len'] = size_generators[size]
     input_config['template'] = open(path.join(SCRIPT_DIR, 'template.html')).read()
-
     iterable = [input_config] * tasks
 
     # fexec = FunctionExecutor(backend=backend, storage=storage, runtime_memory=memory, log_level=log_level)
