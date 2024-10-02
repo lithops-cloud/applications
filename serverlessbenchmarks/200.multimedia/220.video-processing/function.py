@@ -1,11 +1,14 @@
 import datetime
+import glob
+import json
 import os
+import random
 import stat
 import subprocess
-import glob
-import random
 import time
 import uuid
+
+import click
 from lithops import FunctionExecutor, Storage
 
 
@@ -65,13 +68,6 @@ def handler(op, duration, bucket, input, output, key):
     storage.download_file(bucket, os.path.join(input, 'resources', 'ffmpeg'), 'ffmpeg')
     storage.download_file(bucket, os.path.join(input, 'resources', 'watermark.png'), 'watermark.png')
 
-    # Print all folders in the current directory
-    print('Current directory: ', os.getcwd())
-    print('Folders in current directory: ', os.listdir(os.getcwd()))
-
-    # Print all files in the current directory
-    print('Files in current directory: ', os.listdir(os.getcwd()))
-
     # Restore executable permission
     try:
         st = os.stat('ffmpeg')
@@ -112,36 +108,30 @@ def handler(op, duration, bucket, input, output, key):
         }
 
 
-def benchmark(data_dir, benchmarks_bucket, input_folder, output_folder, tasks):
+def benchmark(backend, storage_backend, tasks, datadir, bucket_name, inbucket, outbucket, memory, outdir, name, log_level):
     '''
         Generate test, small and large workload for thumbnailer.
-
-        :param data_dir: directory where benchmark data is placed
-        :param size: 
-        :param input_buckets: 
-        :param output_buckets:
-        :param upload_func: 
     '''
     storage = Storage()
 
     # Upload ffmpeg binary and watermark image
     for file in glob.glob(os.path.join(SCRIPT_DIR, 'resources', '*')):
-        storage.upload_file(file, benchmarks_bucket, os.path.join(input_folder, 'resources', os.path.basename(file)))
+        storage.upload_file(file, bucket_name, os.path.join(inbucket, 'resources', os.path.basename(file)))
 
     # Prepare input data
     list_keys = []
 
-    for file in glob.glob(os.path.join(data_dir, '*.mp4')):
-        img = os.path.relpath(file, data_dir)
+    for file in glob.glob(os.path.join(datadir, '*.mp4')):
+        img = os.path.relpath(file, datadir)
         list_keys.append(img)
-        storage.put_object(benchmarks_bucket, os.path.join(input_folder, img), open(file, 'rb').read())
+        storage.put_object(bucket_name, os.path.join(inbucket, img), open(file, 'rb').read())
 
     input_config_template = {
         'op': 'watermark',
         'duration': 1,
-        'bucket': benchmarks_bucket,
-        'input': input_folder,
-        'output': output_folder
+        'bucket': bucket_name,
+        'input': inbucket,
+        'output': outbucket
     }
 
     iterable = []
@@ -150,8 +140,7 @@ def benchmark(data_dir, benchmarks_bucket, input_folder, output_folder, tasks):
         input_config['key'] = random.choice(list_keys)
         iterable.append(input_config)
 
-    # fexec = FunctionExecutor(backend=backend, storage=storage, runtime_memory=memory, log_level=log_level)
-    fexec = FunctionExecutor()
+    fexec = FunctionExecutor(backend=backend, storage=storage_backend, runtime_memory=memory, log_level=log_level)
 
     start_time = time.time()
     fexec.map(handler, iterable)
@@ -161,13 +150,28 @@ def benchmark(data_dir, benchmarks_bucket, input_folder, output_folder, tasks):
     results = [flops for flops in results if flops is not None]
     total_time = end_time-start_time
     print("Total time:", round(total_time, 3))
-    print(results)
+
+    # Save results to json
+    with open('{}/{}.json'.format(outdir, name), 'w') as f:
+        json.dump(results, f, indent=4)
+    fexec.plot(dst='{}/{}'.format(outdir, name))
+
+
+@click.command()
+@click.option('--backend', '-b', default=None, help='Compute backend name', type=str)
+@click.option('--storage', '-s', default=None, help='Storage backend name', type=str)
+@click.option('--tasks', default=10, help='How many tasks', type=int)
+@click.option('--datadir', help='Directory containing all the data', type=str, required=True)
+@click.option('--bucket_name', help='Bucket name in your storage backend', type=str, required=True)
+@click.option('--inbucket', help='Folder where will be stored the input data in your storage backend', type=str, required=True)
+@click.option('--outbucket', help='Folder where will be stored the output data in your storage backend', type=str, required=True)
+@click.option('--memory', default=1024, help='Memory per worker in MB', type=int)
+@click.option('--outdir', default='.', help='Directory to save results in')
+@click.option('--name', default='220.video-processing', help='Filename to save results in')
+@click.option('--log_level', default='INFO', help='Log level', type=str)
+def run_benchmark(backend, storage, tasks, datadir, bucket_name, inbucket, outbucket, memory, outdir, name, log_level):
+    benchmark(backend, storage, tasks, datadir, bucket_name, inbucket, outbucket, memory, outdir, name, log_level)
 
 
 if __name__ == '__main__':
-    tasks = 1
-    data_dir = ''
-    bucket_name = ''
-    input_folder = ''
-    output_folder = ''
-    benchmark(data_dir, bucket_name, input_folder, output_folder, tasks)
+    run_benchmark()

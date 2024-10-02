@@ -1,11 +1,15 @@
 import datetime
 import glob
 import io
+import json
 import os
 import random
 import time
 import uuid
+
 from PIL import Image
+
+import click
 from lithops import FunctionExecutor, Storage
 
 
@@ -61,31 +65,25 @@ def handler(key, width, height, bucket, input_folder, output_folder):
     }
 
 
-def benchmark(data_dir, bucket, input_folder, output_folder, tasks):
+def benchmark(backend, storage_backend, tasks, datadir, bucket_name, inbucket, outbucket, memory, outdir, name, log_level):
     '''
         Generate test, small and large workload for thumbnailer.
-
-        :param data_dir: str - path to the directory containing the images
-        :param bucket: str - bucket name
-        :param input_folder: str - input folder of the bucket
-        :param output_folder: str - output folder of the bucket
-        :param tasks: int - number of tasks to execute
     '''
     storage = Storage()
 
     list_keys = []
 
-    for file in glob.glob(os.path.join(data_dir, '*.jpg')):
-        img = os.path.relpath(file, data_dir)
+    for file in glob.glob(os.path.join(datadir, '*.jpg')):
+        img = os.path.relpath(file, datadir)
         list_keys.append(img)
-        storage.put_object(bucket, os.path.join(input_folder, img), open(file, 'rb').read())
+        storage.put_object(bucket_name, os.path.join(inbucket, img), open(file, 'rb').read())
 
     input_config_template = {
         'width': 200,
         'height': 200,
-        'bucket': bucket,
-        'input_folder': input_folder,
-        'output_folder': output_folder
+        'bucket': bucket_name,
+        'input_folder': inbucket,
+        'output_folder': outbucket
     }
 
     iterable = []
@@ -94,8 +92,7 @@ def benchmark(data_dir, bucket, input_folder, output_folder, tasks):
         input_config['key'] = random.choice(list_keys)
         iterable.append(input_config)
 
-    # fexec = FunctionExecutor(backend=backend, storage=storage, runtime_memory=memory, log_level=log_level)
-    fexec = FunctionExecutor()
+    fexec = FunctionExecutor(backend=backend, storage=storage_backend, runtime_memory=memory, log_level=log_level)
 
     start_time = time.time()
     fexec.map(handler, iterable)
@@ -106,11 +103,27 @@ def benchmark(data_dir, bucket, input_folder, output_folder, tasks):
     total_time = end_time-start_time
     print("Total time:", round(total_time, 3))
 
+    # Save results to json
+    with open('{}/{}.json'.format(outdir, name), 'w') as f:
+        json.dump(results, f, indent=4)
+    fexec.plot(dst='{}/{}'.format(outdir, name))
+
+
+@click.command()
+@click.option('--backend', '-b', default=None, help='Compute backend name', type=str)
+@click.option('--storage', '-s', default=None, help='Storage backend name', type=str)
+@click.option('--tasks', default=10, help='How many tasks', type=int)
+@click.option('--datadir', help='Directory containing all the data', type=str, required=True)
+@click.option('--bucket_name', help='Bucket name in your storage backend', type=str, required=True)
+@click.option('--inbucket', help='Folder where will be stored the input data in your storage backend', type=str, required=True)
+@click.option('--outbucket', help='Folder where will be stored the output data in your storage backend', type=str, required=True)
+@click.option('--memory', default=1024, help='Memory per worker in MB', type=int)
+@click.option('--outdir', default='.', help='Directory to save results in')
+@click.option('--name', default='210.thumbnailer', help='Filename to save results in')
+@click.option('--log_level', default='INFO', help='Log level', type=str)
+def run_benchmark(backend, storage, tasks, datadir, bucket_name, inbucket, outbucket, memory, outdir, name, log_level):
+    benchmark(backend, storage, tasks, datadir, bucket_name, inbucket, outbucket, memory, outdir, name, log_level)
+
 
 if __name__ == '__main__':
-    tasks = 100
-    data_dir = ''
-    bucket_name = ''
-    input_folder = ''
-    output_folder = ''
-    benchmark(data_dir, bucket_name, input_folder, output_folder, tasks)
+    run_benchmark()

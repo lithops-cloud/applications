@@ -5,6 +5,7 @@ import random
 import time
 import uuid
 
+import click
 from PIL import Image
 import torch
 from torchvision import transforms
@@ -78,30 +79,28 @@ def handler(model_storage, bucket, input, key):
         }
 
 
-def benchmark(data_dir, benchmarks_bucket, input_paths, tasks):
+def benchmark(backend, storage_backend, tasks, datadir, bucket_name, inbucket, memory, outdir, name, log_level):
     '''
         Generate test, small and large workload for compression test.
-        :param data_dir: directory where benchmark data is placed
-        :param input_buckets: 
     '''
     storage = Storage()
 
     # upload model
     model_name = 'resnet50-19c8e357.pth'
-    storage.upload_file(os.path.join(data_dir, 'model', model_name), benchmarks_bucket, os.path.join(input_paths, model_name))
+    storage.upload_file(os.path.join(datadir, 'model', model_name), bucket_name, os.path.join(inbucket, model_name))
 
     input_images = []
-    resnet_path = os.path.join(data_dir, 'fake-resnet')
+    resnet_path = os.path.join(datadir, 'fake-resnet')
     with open(os.path.join(resnet_path, 'val_map.txt'), 'r') as f:
         for line in f:
             img, img_class = line.split()
             input_images.append(img)
-            storage.upload_file(os.path.join(resnet_path, img), benchmarks_bucket, os.path.join(input_paths, img))
+            storage.upload_file(os.path.join(resnet_path, img), bucket_name, os.path.join(inbucket, img))
 
     input_config_template = {
         'model_storage': model_name,
-        'bucket': benchmarks_bucket,
-        'input': input_paths,
+        'bucket': bucket_name,
+        'input': inbucket,
     }
 
     iterable = []
@@ -110,8 +109,7 @@ def benchmark(data_dir, benchmarks_bucket, input_paths, tasks):
         input_config['key'] = random.choice(input_images)
         iterable.append(input_config)
 
-    # fexec = FunctionExecutor(backend=backend, storage=storage, runtime_memory=memory, log_level=log_level)
-    fexec = FunctionExecutor()
+    fexec = FunctionExecutor(backend=backend, storage=storage_backend, runtime_memory=memory, log_level=log_level)
 
     start_time = time.time()
     fexec.map(handler, iterable)
@@ -122,10 +120,26 @@ def benchmark(data_dir, benchmarks_bucket, input_paths, tasks):
     total_time = end_time-start_time
     print("Total time:", round(total_time, 3))
 
+    # Save results to json
+    with open('{}/{}.json'.format(outdir, name), 'w') as f:
+        json.dump(results, f, indent=4)
+    fexec.plot(dst='{}/{}'.format(outdir, name))
+
+
+@click.command()
+@click.option('--backend', '-b', default=None, help='Compute backend name', type=str)
+@click.option('--storage', '-s', default=None, help='Storage backend name', type=str)
+@click.option('--tasks', default=10, help='How many tasks', type=int)
+@click.option('--datadir', help='Directory containing all the data', type=str, required=True)
+@click.option('--bucket_name', help='Bucket name in your storage backend', type=str, required=True)
+@click.option('--inbucket', help='Folder where will be stored the input data in your storage backend', type=str, required=True)
+@click.option('--memory', default=1024, help='Memory per worker in MB', type=int)
+@click.option('--outdir', default='.', help='Directory to save results in')
+@click.option('--name', default='411.image-recognition', help='Filename to save results in')
+@click.option('--log_level', default='INFO', help='Log level', type=str)
+def run_benchmark(backend, storage, tasks, datadir, bucket_name, inbucket, memory, outdir, name, log_level):
+    benchmark(backend, storage, tasks, datadir, bucket_name, inbucket, memory, outdir, name, log_level)
+
 
 if __name__ == '__main__':
-    tasks = 1
-    data_dir = ''
-    bucket_name = ''
-    input_folder = ''
-    benchmark(data_dir, bucket_name, input_folder, tasks)
+    run_benchmark()

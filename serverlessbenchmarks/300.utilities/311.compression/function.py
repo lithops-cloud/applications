@@ -1,10 +1,12 @@
 import datetime
+import json
 import os
 import random
 import shutil
 import time
 import uuid
 
+import click
 from lithops import FunctionExecutor, Storage
 
 storage = Storage()
@@ -23,6 +25,7 @@ def parse_directory(directory):
         for file in files:
             size += os.path.getsize(os.path.join(root, file))
     return size
+
 
 def handler(bucket, input, output, key):
     storage = Storage()
@@ -72,27 +75,22 @@ def upload_files(data_root, data_dir, bucket, input):
             storage.upload_file(filepath, bucket, os.path.join(input, file_name))
 
 
-def benchmark(data_dir, benchmarks_bucket, input_paths, output_paths, tasks):
+def benchmark(backend, storage_backend, tasks, datadir, bucket_name, inbucket, outbucket, memory, outdir, name, log_level):
     '''
         Generate test, small and large workload for compression test.
-
-        :param data_dir: directory where benchmark data is placed
-        :param size:
-        :param input_buckets:
-        :param output_buckets:
     '''
 
     # upload different datasets
     datasets = []
 
-    for dir in os.listdir(data_dir):
+    for dir in os.listdir(datadir):
         datasets.append(dir)
-        upload_files(data_dir, os.path.join(data_dir, dir), benchmarks_bucket, input_paths)
+        upload_files(datadir, os.path.join(datadir, dir), bucket_name, inbucket)
 
     input_config_template = {
-        'bucket': benchmarks_bucket,
-        'input': input_paths,
-        'output': output_paths
+        'bucket': bucket_name,
+        'input': inbucket,
+        'output': outbucket
     }
 
     iterable = []
@@ -101,8 +99,7 @@ def benchmark(data_dir, benchmarks_bucket, input_paths, output_paths, tasks):
         input_config['key'] = random.choice(datasets)
         iterable.append(input_config)
 
-    # fexec = FunctionExecutor(backend=backend, storage=storage, runtime_memory=memory, log_level=log_level)
-    fexec = FunctionExecutor()
+    fexec = FunctionExecutor(backend=backend, storage=storage_backend, runtime_memory=memory, log_level=log_level)
 
     start_time = time.time()
     fexec.map(handler, iterable)
@@ -112,13 +109,28 @@ def benchmark(data_dir, benchmarks_bucket, input_paths, output_paths, tasks):
     results = [flops for flops in results if flops is not None]
     total_time = end_time-start_time
     print("Total time:", round(total_time, 3))
-    print(results)
+
+    # Save results to json
+    with open('{}/{}.json'.format(outdir, name), 'w') as f:
+        json.dump(results, f, indent=4)
+    fexec.plot(dst='{}/{}'.format(outdir, name))
+
+
+@click.command()
+@click.option('--backend', '-b', default=None, help='Compute backend name', type=str)
+@click.option('--storage', '-s', default=None, help='Storage backend name', type=str)
+@click.option('--tasks', default=10, help='How many tasks', type=int)
+@click.option('--datadir', help='Directory containing all the data', type=str, required=True)
+@click.option('--bucket_name', help='Bucket name in your storage backend', type=str, required=True)
+@click.option('--inbucket', help='Folder where will be stored the input data in your storage backend', type=str, required=True)
+@click.option('--outbucket', help='Folder where will be stored the output data in your storage backend', type=str, required=True)
+@click.option('--memory', default=1024, help='Memory per worker in MB', type=int)
+@click.option('--outdir', default='.', help='Directory to save results in')
+@click.option('--name', default='311.compression', help='Filename to save results in')
+@click.option('--log_level', default='INFO', help='Log level', type=str)
+def run_benchmark(backend, storage, tasks, datadir, bucket_name, inbucket, outbucket, memory, outdir, name, log_level):
+    benchmark(backend, storage, tasks, datadir, bucket_name, inbucket, outbucket, memory, outdir, name, log_level)
 
 
 if __name__ == '__main__':
-    tasks = 1
-    data_dir = ''
-    bucket_name = ''
-    input_folder = ''
-    output_folder = ''
-    benchmark(data_dir, bucket_name, input_folder, output_folder, tasks)
+    run_benchmark()

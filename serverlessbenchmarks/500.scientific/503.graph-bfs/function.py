@@ -1,8 +1,11 @@
 import datetime
+import json
 import time
 
-from lithops import FunctionExecutor
+import click
 import igraph
+from lithops import FunctionExecutor
+
 
 size_generators = {
     'test': 10,
@@ -32,10 +35,10 @@ def handler(size):
     }
 
 
-def benchmark(size, tasks):
+def benchmark(backend, storage, tasks, size, memory, outdir, name, log_level):
     iterable = [size_generators[size]] * tasks
 
-    # fexec = FunctionExecutor(backend=backend, storage=storage, runtime_memory=memory, log_level=log_level)
+    fexec = FunctionExecutor(backend=backend, storage=storage, runtime_memory=memory, log_level=log_level)
     fexec = FunctionExecutor()
 
     start_time = time.time()
@@ -47,7 +50,24 @@ def benchmark(size, tasks):
     total_time = end_time-start_time
     print("Total time:", round(total_time, 3))
 
+    # Save results to json
+    with open('{}/{}.json'.format(outdir, name), 'w') as f:
+        json.dump(results, f, indent=4)
+    fexec.plot(dst='{}/{}'.format(outdir, name))
+
+
+@click.command()
+@click.option('--backend', '-b', default=None, help='Compute backend name', type=str)
+@click.option('--storage', '-s', default=None, help='Storage backend name', type=str)
+@click.option('--tasks', default=10, help='How many tasks', type=int)
+@click.option('--size', default='test', help='Size of the benchmark', type=str)
+@click.option('--memory', default=1024, help='Memory per worker in MB', type=int)
+@click.option('--outdir', default='.', help='Directory to save results in')
+@click.option('--name', default='503.graph-bfs', help='Filename to save results in')
+@click.option('--log_level', default='INFO', help='Log level', type=str)
+def run_benchmark(backend, storage, tasks, size, memory, outdir, name, log_level):
+    benchmark(backend, storage, tasks, size, memory, outdir, name, log_level)
+
 
 if __name__ == '__main__':
-    tasks = 1
-    benchmark('test', tasks)
+    run_benchmark()

@@ -1,11 +1,12 @@
-from lithops import FunctionExecutor
-from lithops import Storage
 import datetime
+import json
 import os
 import time
 import uuid
-
 import urllib.request
+
+import click
+from lithops import FunctionExecutor, Storage
 
 
 url_generators = {
@@ -50,15 +51,14 @@ def handler(url, bucket, output_folder):
     }
 
 
-def benchmark(size, bucket, output_folder, tasks):
+def benchmark(backend, storage, tasks, size, bucket_name, outbucket, memory, outdir, name, log_level):
     input_config = {}
     input_config['url'] = url_generators[size]
-    input_config['bucket'] = bucket
-    input_config['output_folder'] = output_folder
+    input_config['bucket'] = bucket_name
+    input_config['output_folder'] = outbucket
     iterable = [input_config] * tasks
 
-    # fexec = FunctionExecutor(backend=backend, storage=storage, runtime_memory=memory, log_level=log_level)
-    fexec = FunctionExecutor()
+    fexec = FunctionExecutor(backend=backend, storage=storage, runtime_memory=memory, log_level=log_level)
 
     start_time = time.time()
     fexec.map(handler, iterable)
@@ -69,9 +69,26 @@ def benchmark(size, bucket, output_folder, tasks):
     total_time = end_time-start_time
     print("Total time:", round(total_time, 3))
 
+    # Save results to json
+    with open('{}/{}.json'.format(outdir, name), 'w') as f:
+        json.dump(results, f, indent=4)
+    fexec.plot(dst='{}/{}'.format(outdir, name))
+
+
+@click.command()
+@click.option('--backend', '-b', default=None, help='Compute backend name', type=str)
+@click.option('--storage', '-s', default=None, help='Storage backend name', type=str)
+@click.option('--tasks', default=10, help='How many tasks', type=int)
+@click.option('--size', default='test', help='Size of the benchmark', type=str)
+@click.option('--bucket_name', help='Bucket name in your storage backend', type=str, required=True)
+@click.option('--outbucket', help='Output folder in your storage backend', type=str, required=True)
+@click.option('--memory', default=1024, help='Memory per worker in MB', type=int)
+@click.option('--outdir', default='.', help='Directory to save results in')
+@click.option('--name', default='120.uploader', help='Filename to save results in')
+@click.option('--log_level', default='INFO', help='Log level', type=str)
+def run_benchmark(backend, storage, tasks, size, bucket_name, outbucket, memory, outdir, name, log_level):
+    benchmark(backend, storage, tasks, size, bucket_name, outbucket, memory, outdir, name, log_level)
+
 
 if __name__ == '__main__':
-    tasks = 10
-    bucket_name = ''
-    output_folder = ''
-    benchmark('test', bucket_name, output_folder, tasks)
+    run_benchmark()
