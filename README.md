@@ -3,7 +3,7 @@
 This repository contains examples of Lithops applications in different ambits.
 
 
-1. [Serverless benchmarks](benchmarks)
+1. [Flops and object storage benchmarks](benchmarks)
 
 2. [Monte Carlo applications](montecarlo)
 
@@ -16,3 +16,5 @@ This repository contains examples of Lithops applications in different ambits.
 6. [GROMACS computations](gromacs)
 
 7. [Airbnb comments sentiment analysis](airbnb)
+
+8. [Serverless benchmarks](serverlessbenchmarks)
