@@ -30,7 +30,8 @@ def handler(url, bucket, output_folder):
 
     storage = Storage()
     upload_begin = datetime.datetime.now()
-    key_name = storage.put_object(bucket, os.path.join(output_folder, name), open(download_path, 'rb').read())
+    key_name = os.path.join(output_folder, name)
+    storage.put_object(bucket, key_name, open(download_path, 'rb').read())
     upload_end = datetime.datetime.now()
 
     process_time = (process_end - process_begin) / datetime.timedelta(microseconds=1)

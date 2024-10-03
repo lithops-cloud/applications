@@ -28,7 +28,8 @@ def handler(bucket, input_folder, output_folder, key):
     upload_begin = datetime.datetime.now()
     buf = io.BytesIO(json.dumps(result).encode())
     buf.seek(0)
-    key_name = storage.put_object(bucket, os.path.join(output_folder, '{}-{}'.format(uuid.uuid4(), key)), buf)
+    key_name = os.path.join(output_folder, '{}-{}'.format(uuid.uuid4(), key))
+    storage.put_object(bucket, key_name, buf)
     upload_stop = datetime.datetime.now()
     buf.close()
 

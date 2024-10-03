@@ -44,7 +44,8 @@ def handler(key, width, height, bucket, input_folder, output_folder):
 
     upload_key = 'resized-{}-{}'.format(uuid.uuid4(), key)
     upload_begin = datetime.datetime.now()
-    key_name = storage.put_object(bucket, os.path.join(output_folder, upload_key), resized.getvalue())
+    key_name = os.path.join(output_folder, upload_key)
+    storage.put_object(bucket, key_name, resized.getvalue())
     upload_end = datetime.datetime.now()
 
     download_time = (download_end - download_begin) / datetime.timedelta(microseconds=1)

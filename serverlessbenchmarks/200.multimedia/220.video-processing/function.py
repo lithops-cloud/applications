@@ -87,7 +87,8 @@ def handler(op, duration, bucket, input, output, key):
     upload_begin = datetime.datetime.now()
     filename = '{}-{}'.format(uuid.uuid4(), os.path.basename(upload_path))
     upload_size = os.path.getsize(upload_path)
-    upload_key = storage.upload_file(upload_path, bucket, os.path.join(output, filename))
+    upload_key = os.path.join(output, filename)
+    storage.upload_file(upload_path, bucket, upload_key)
     upload_stop = datetime.datetime.now()
 
     download_time = (download_stop - download_begin) / datetime.timedelta(microseconds=1)
