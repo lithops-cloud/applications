@@ -13,7 +13,7 @@ PaaS Service Flops Benchmark
 - [OVH Managed Kubernetes](flops/ovhcloud_managed_k8s)
 
 CaaS Service Flops Benchmark
-- [Singularity](flops/singularity)
+- [Singularity](flops/singularity) (Includes 11.200 and 22.400 function executions)
 
 Object Storage Benchmark from FaaS Service
 - [IBM Cloud Object Storage](object_storage/ibm_cos)
