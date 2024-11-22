@@ -33,7 +33,7 @@ Download the dataset from [here](https://www.kaggle.com/bittlingmayer/amazonrevi
 
 ## Run
 
-You can see options and run the code with the lines below. This application is not meant to be run on the noteebok. You may encounter problems if you try to run it on Jupyter Notebook.
+You can see options and run the code with the lines below. This application is not meant to be run on the notebook. You may encounter problems if you try to run it on Jupyter Notebook.
 
    ```bash
    $ python3 gridsearch.py --help
