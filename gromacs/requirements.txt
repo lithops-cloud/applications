@@ -1,0 +1,4 @@
+lithops[aws, plotting]
+wget
+json
+zipfile
