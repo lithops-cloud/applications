@@ -1,0 +1,4 @@
+lithops[aws, plotting]
+nltk
+geopy
+basemap

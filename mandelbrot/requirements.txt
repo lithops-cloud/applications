@@ -1,0 +1,4 @@
+redis
+lithops[plotting]
+PyQt5
+ipympl

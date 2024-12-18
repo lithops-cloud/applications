@@ -65,9 +65,11 @@ There are 2 major functions in this example:
 
 - **create_map:** This method functions as the reduce function in this scenario. It reduces all the intermediate data grouped by sentiments and draws a map displaying the results in different colors accordingly.
 
-## Lithops configuration
+## Configuration
 
-You need to configure lithops with your own IBM account keys. You can also see more options about the configuration [here](https://github.com/lithops-cloud/lithops/tree/master/config).
+### IBM Cloud
+
+This is the original code of the experiments presented in [Serverless Data Analytics in the IBM Cloud](https://dl.acm.org/doi/abs/10.1145/3284028.3284029). You need to configure lithops with your own IBM account keys. You can also see more options about the configuration [here](https://github.com/lithops-cloud/lithops/tree/master/config).
 ```python
 config = {'lithops': {'backend': 'ibm_cf', 'storage': 'ibm_cos'},
           'ibm': {'iam_api_key': '<IAM_API_KEY>'},# If your namespace is IAM based (To reach cloud functions API without cf api key)
@@ -80,3 +82,10 @@ config = {'lithops': {'backend': 'ibm_cf', 'storage': 'ibm_cos'},
                       'region': '<BUCKET_REGION>',
                       'api_key': '<YOUR_API_KEY>'}}
 ```
+
+## AWS
+
+We also provide a small [execution demo in AWS](./map_sentiment_analysis.ipynb). Input data is publicly available at [lithops-applications-data](https://lithops-applications-data.s3.us-east-1.amazonaws.com/), users should upload it to their custom bucket with [import_dataset_aws.sh](../import_datasets_aws.sh) (incurs into "Requester pays" billing).
+
+To run the AWS example, simply run the [map_sentiment_analysis.ipynb](map_sentiment_analysis.ipynb) notebook following the AWS-specific steps.
+

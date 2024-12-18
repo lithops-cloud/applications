@@ -1,0 +1,5 @@
+scikit-learn==1.3.0
+lithops[aws]
+kagglehub
+ray
+diskcache

@@ -8,14 +8,15 @@ from pprint import pprint
 from time import time
 import click
 import bz2
+import kagglehub
 
 
-def load_data(mib):
+def load_data(mib, path):
     # Download the dataset at
     # https://www.kaggle.com/bittlingmayer/amazonreviews
 
     print("Loading Amazon reviews dataset:")
-    compressed = bz2.BZ2File('./train.ft.txt.bz2')
+    compressed = bz2.BZ2File(path)
 
     X = []
     y = []
@@ -46,7 +47,12 @@ def load_data(mib):
 
 def main(backend, address, mib, refit, jobs):
 
-    X, y = load_data(mib)
+    # Download latest version
+    path = kagglehub.dataset_download("bittlingmayer/amazonreviews")
+
+    print("Path to dataset files:", path)
+
+    X, y = load_data(mib, path)
 
     n_features = 2 ** 18
     pipeline = Pipeline([

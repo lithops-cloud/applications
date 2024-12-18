@@ -119,7 +119,7 @@ def create_map(results):
     plt.switch_backend('agg')
     plt.figure(figsize=(6.7, 6.7), dpi=96)
 
-    geolocator = Nominatim()
+    geolocator = Nominatim(user_agent="lithops")
     loc = geolocator.geocode(city)
     if not loc:
         print("Could not locate {}".format(city))
@@ -185,7 +185,7 @@ if __name__ == "__main__":
     t0 = time.time()
 
     fexec = lithops.FunctionExecutor(runtime='jsampe/lithops-mpl-nltk-v36', runtime_memory=2048)
-    fexec.map_reduce(analyze_comments, BUCKET, create_map, reducer_one_per_object=True)
+    fexec.map_reduce(analyze_comments, BUCKET, create_map, obj_reduce_by_key=True)
     # fexec.map(analyze_comments, BUCKET)
     results = fexec.get_result()
 
