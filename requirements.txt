@@ -1,0 +1,2 @@
+lithops[plotting]
+matplotlib
